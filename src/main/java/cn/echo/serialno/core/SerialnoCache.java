@@ -18,8 +18,7 @@ import java.util.List;
  * SerialnoCache
   *  编号池服务
  * @author lonyee
- * @date 2019-07-25 20:19:20
- * 
+ *
  **************************/
 public class SerialnoCache {
 

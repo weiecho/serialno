@@ -15,7 +15,7 @@ public interface SerialnoEnumerable {
 	/** 每次缓存号段长度 **/
 	Integer getStep();
 
-	/** 生成号池策略  默认 顺序策略 1->9 **/
+	/** 生成号池策略  默认 顺序策略 1-9 **/
 	SerialnoStrategy getStrategy();
 
 	/** 是否排除幸运号 **/

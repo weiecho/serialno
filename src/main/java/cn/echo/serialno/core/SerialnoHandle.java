@@ -1,6 +1,7 @@
 package cn.echo.serialno.core;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,8 +11,8 @@ import java.util.regex.Pattern;
 /**
  * 序列号业务处理
  */
-@Slf4j
 public class SerialnoHandle {
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
 
     // 判断是否幸运号（3位同号 + 4位连号）
     private final static Pattern luckSuidRegexPattern = Pattern.compile("^\\d*([0-9])\\1{2,}\\d*$" + // 连续相同数字
