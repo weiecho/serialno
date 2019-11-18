@@ -35,20 +35,20 @@ public class SerialnoCache {
 	/**
 	 * 根据标识获取编号
 	 */
-	public Integer getSerialno(SerialnoEnumerable serialnoEnum) {
+	public Long getSerialno(SerialnoEnumerable serialnoEnum) {
 		BoundListOperations<String, Number> operations = redisTemplate.boundListOps(preSerialNoKey + serialnoEnum.getBizTag());
 		Number number = operations.leftPop();
-		return number==null? 0: number.intValue();
+		return number==null? 0: number.longValue();
 	}
 	
 	/**
 	 * 根据标识分配号池，返回起始号码
 	 */
-	public Integer allocSerialnoByBizTag(SerialnoEnumerable serialnoEnum) {
+	public Long allocSerialnoByBizTag(SerialnoEnumerable serialnoEnum) {
 		Long serialnoCount = redisTemplate.boundSetOps(preSerialNoKey + serialnoEnum.getBizTag()).size();
 		if (serialnoCount > serialnoEnum.getStep()) {
 			log.info("编号池[{}]数据量[{}]已经远大于step[{}]", serialnoEnum.getBizTag(), serialnoCount, serialnoEnum.getStep());
-			return -1;
+			return -1L;
 		}
 		BoundHashOperations<String, String, Number> boundHashOperations = redisTemplate.boundHashOps(preSerialNoKey+"MAT");
 		Number currMaxNo = boundHashOperations.get(serialnoEnum.getBizTag());
@@ -60,13 +60,13 @@ public class SerialnoCache {
 		}
 
 		boundHashOperations.increment(serialnoEnum.getBizTag(), serialnoEnum.getStep());
-		return currMaxNo.intValue();
+		return currMaxNo.longValue();
 	}
 	
 	/**
 	 *  批量添加号池
 	 */
-	public void addSerialnos(SerialnoEnumerable serialnoEnum, List<Integer> serialNos) {
+	public void addSerialnos(SerialnoEnumerable serialnoEnum, List<Long> serialNos) {
 		BoundListOperations<String, Number> operations = redisTemplate.boundListOps(preSerialNoKey + serialnoEnum.getBizTag());
 		operations.rightPushAll(serialNos.toArray(new Number[0]));
 	}

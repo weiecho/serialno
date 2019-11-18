@@ -32,11 +32,11 @@ public class SerialnoHandle {
     public void generateSerialNo(SerialnoEnumerable serialnoEnum) {
 
         Integer oneTimeCount = 100000; // 一次调用生成编号数量
-        List<Integer> listSerialNo = new ArrayList<Integer>();
-        Integer initNum = serialnoCache.allocSerialnoByBizTag(serialnoEnum);
+        List<Long> listSerialNo = new ArrayList<Long>();
+        Long initNum = serialnoCache.allocSerialnoByBizTag(serialnoEnum);
 
-        int maxNum = initNum + serialnoEnum.getStep() - 1;
-        for (int i = initNum; i <= maxNum; i++) {
+        long maxNum = initNum + serialnoEnum.getStep() - 1;
+        for (long i = initNum; i <= maxNum; i++) {
             //去除幸运号
             if (serialnoEnum.getExcludeLuckNum()) {
                 boolean isLuckyNum = luckSuidRegexPattern.matcher(i+"").find();

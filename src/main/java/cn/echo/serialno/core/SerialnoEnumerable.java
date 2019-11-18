@@ -10,10 +10,10 @@ public interface SerialnoEnumerable {
 	String getBizTag();
 
 	/** 初始起始值 **/
-	Integer getInitNum();
+	Long getInitNum();
 
 	/** 每次缓存号段长度 **/
-	Integer getStep();
+	Long getStep();
 
 	/** 生成号池策略  默认 顺序策略 1-9 **/
 	SerialnoStrategy getStrategy();

@@ -35,7 +35,7 @@ public class SerialnoGenerator {
     /**
      * 根据标识获取编号
      */
-    public Integer getSerialno(SerialnoEnumerable serialnoEnum) {
+    public Long getSerialno(SerialnoEnumerable serialnoEnum) {
         return serialnoCache.getSerialno(serialnoEnum);
     }
 
