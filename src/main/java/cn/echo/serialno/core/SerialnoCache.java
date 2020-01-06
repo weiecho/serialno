@@ -54,7 +54,7 @@ public class SerialnoCache {
 		Number currMaxNo = boundHashOperations.get(serialnoEnum.getBizTag());
 
 		//开始或重新设置了起始位置时调整位置
-		if (currMaxNo.intValue() <= serialnoEnum.getInitNum()) {
+		if (currMaxNo==null || currMaxNo.intValue() <= serialnoEnum.getInitNum()) {
 			boundHashOperations.put(serialnoEnum.getBizTag(), serialnoEnum.getInitNum() + serialnoEnum.getStep());
 			return serialnoEnum.getInitNum();
 		}
