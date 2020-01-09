@@ -43,10 +43,11 @@ public class SerialnoGenerator {
      * 生成编号池
      * */
     public void generateSerialnos() {
-        log.info("start generate serialno ... ");
+        log.info("开始生成编号池 ... ");
         for (SerialnoEnumerable serialnoEnum: serialnoEnums) {
             serialnoHandle.generateSerialNo(serialnoEnum);
         }
+        log.info("编号池生成完成. ");
     }
 
     /**

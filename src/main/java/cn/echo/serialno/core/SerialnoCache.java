@@ -45,7 +45,7 @@ public class SerialnoCache {
 	 * 根据标识分配号池，返回起始号码
 	 */
 	public Long allocSerialnoByBizTag(SerialnoEnumerable serialnoEnum) {
-		Long serialnoCount = redisTemplate.boundSetOps(preSerialNoKey + serialnoEnum.getBizTag()).size();
+		Long serialnoCount = redisTemplate.boundListOps(preSerialNoKey + serialnoEnum.getBizTag()).size();
 		if (serialnoCount > serialnoEnum.getStep()) {
 			log.info("编号池[{}]数据量[{}]已经远大于step[{}]", serialnoEnum.getBizTag(), serialnoCount, serialnoEnum.getStep());
 			return -1L;
