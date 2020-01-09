@@ -34,6 +34,10 @@ public class SerialnoHandle {
         Integer oneTimeCount = 100000; // 一次调用生成编号数量
         List<Long> listSerialNo = new ArrayList<Long>();
         Long initNum = serialnoCache.allocSerialnoByBizTag(serialnoEnum);
+        if(initNum <= -1L) {
+            //如果号池超量则不再生成
+            return;
+        }
 
         long maxNum = initNum + serialnoEnum.getStep() - 1;
         for (long i = initNum; i <= maxNum; i++) {
