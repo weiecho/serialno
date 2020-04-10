@@ -13,6 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import java.lang.Math;
+
 /**
  * 序列号生成器
  * @author lonyee
@@ -37,6 +39,30 @@ public class SerialnoGenerator {
      */
     public Long getSerialno(SerialnoEnumerable serialnoEnum) {
         return serialnoCache.getSerialno(serialnoEnum);
+    }
+
+
+    /**
+     * 根据标识获取编号
+     */
+    public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer prefix, Integer length) {
+        int len = (int) Math.log10(prefix) +1;
+        if (len <= length) {
+            return 0L;
+        }
+        long sno = prefix * (long) Math.pow(10, length - len);
+        return sno + serialnoCache.getSerialno(serialnoEnum);
+    }
+
+    /**
+     * 根据标识获取编号
+     */
+    public String getSerialno(SerialnoEnumerable serialnoEnum, String prefix, Integer length) {
+        if (length<=prefix.length()) {
+            return "0";
+        }
+        String format = "%0"+ (length - prefix.length()) +"d";
+        return prefix + String.format(format, serialnoCache.getSerialno(serialnoEnum));
     }
 
     /**
