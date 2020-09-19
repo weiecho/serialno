@@ -11,9 +11,8 @@ import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import java.lang.Math;
 
 /**
  * 序列号生成器
@@ -46,23 +45,65 @@ public class SerialnoGenerator {
      * 根据标识获取编号
      */
     public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer prefix, Integer length) {
-        int len = (int) Math.log10(prefix) +1;
-        if (len <= length) {
-            return 0L;
+        return this.getSerialno(serialnoEnum, prefix, length, 0);
+    }
+    
+    /**
+     * 根据标识获取编号
+     */
+    public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer randomLength) {
+        return this.getSerialno(serialnoEnum, 0, 0, randomLength);
+    }
+
+    /**
+     * 根据标识获取编号
+     */
+    public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer prefix, Integer length, Integer randomLength) {
+        int len = 0;
+        long pow = 0;
+        long pno = 0;
+        if (prefix!=null && prefix>0) {
+            len = (int) Math.log10(prefix) +1;
+            if (len + randomLength >= length) {
+                return 0L;
+            }
+            pow = (long) Math.pow(10, length - len);
+            pno = prefix * pow;
         }
-        long sno = prefix * (long) Math.pow(10, length - len);
-        return sno + serialnoCache.getSerialno(serialnoEnum);
+        long sno = serialnoCache.getSerialno(serialnoEnum);
+        long suffix = 0;
+        if (randomLength!=null && randomLength>0) {
+            pow = (long) Math.pow(10, randomLength);
+            suffix = ThreadLocalRandom.current().nextLong(pow);
+            sno = sno * pow;
+        }
+        return pno + sno + suffix;
     }
 
     /**
      * 根据标识获取编号
      */
     public String getSerialno(SerialnoEnumerable serialnoEnum, String prefix, Integer length) {
-        if (length<=prefix.length()) {
+        return this.getSerialno(serialnoEnum, prefix, length, 0);
+    }
+
+    /**
+     * 根据标识获取编号
+     */
+    public String getSerialno(SerialnoEnumerable serialnoEnum, String prefix, Integer length, Integer randomLength) {
+        if (prefix==null || length<=prefix.length()) {
             return "0";
         }
-        String format = "%0"+ (length - prefix.length()) +"d";
-        return prefix + String.format(format, serialnoCache.getSerialno(serialnoEnum));
+
+        long sno = serialnoCache.getSerialno(serialnoEnum);
+        long suffix = 0;
+        if (randomLength!=null && randomLength>0) {
+            long pow = (long) Math.pow(10, randomLength);
+            suffix = ThreadLocalRandom.current().nextLong(pow);
+            sno = sno * pow;
+        }
+        String format = "%0"+ (length - prefix.length() - randomLength) +"d";
+        return prefix + String.format(format, sno + suffix);
     }
 
     /**
@@ -84,7 +125,7 @@ public class SerialnoGenerator {
         Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(final Runnable r) {
-                Thread thread = new Thread(r, "schedule-serialno-generator");
+                Thread thread = new Thread(r, "schedule-serialno");
                 thread.setDaemon(true);
                 return thread;
             }

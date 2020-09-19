@@ -44,15 +44,17 @@ public class SerialnoHandle {
             //去除幸运号
             if (serialnoEnum.getExcludeLuckNum()) {
                 boolean isLuckyNum = luckSuidRegexPattern.matcher(i+"").find();
-                if (isLuckyNum) {
+                if (!isLuckyNum) {
+                    listSerialNo.add(i);
+                } else if (i < maxNum){
                     continue;
                 }
+            } else {
+                listSerialNo.add(i);
             }
 
-            listSerialNo.add(i);
-
             // 一次调用生成编号
-            if (listSerialNo.size() == oneTimeCount || i == maxNum) {
+            if (listSerialNo.size() >= oneTimeCount || i == maxNum) {
                 //SerialnoStrategy.RANDOM 打乱顺序
                 if (serialnoEnum.getStrategy() == SerialnoStrategy.RANDOM) {
                     Collections.shuffle(listSerialNo);

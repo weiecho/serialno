@@ -7,7 +7,7 @@
     <groupId>cn.weiecho</groupId>
     <artifactId>serialno</artifactId>
     <name>serialno</name>
-    <version>1.0.4</version>
+    <version>1.0.6</version>
     <description>serial no produce</description>
     <url>https://github.com/weiecho/serialno</url>
     <scm>
@@ -60,6 +60,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <build>
+                <pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -112,6 +113,7 @@
                         </executions>
                     </plugin>
                 </plugins>
+                </pluginManagement>
             </build>
             <distributionManagement>
                 <snapshotRepository>
