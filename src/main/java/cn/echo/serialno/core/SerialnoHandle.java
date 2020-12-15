@@ -31,7 +31,7 @@ public class SerialnoHandle {
      */
     public void generateSerialNo(SerialnoEnumerable serialnoEnum) {
 
-        Integer oneTimeCount = 100000; // 一次调用生成编号数量
+        Integer oneTimeCount = 10000; // 一次调用生成编号数量
         List<Long> listSerialNo = new ArrayList<Long>();
         Long initNum = serialnoCache.allocSerialnoByBizTag(serialnoEnum);
         if(initNum <= -1L) {
