@@ -7,7 +7,7 @@
     <groupId>cn.weiecho</groupId>
     <artifactId>serialno</artifactId>
     <name>serialno</name>
-    <version>1.0.8</version>
+    <version>1.1.0</version>
     <description>serial no produce</description>
     <url>https://github.com/weiecho/serialno</url>
     <scm>

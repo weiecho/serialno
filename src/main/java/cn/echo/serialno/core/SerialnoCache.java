@@ -6,15 +6,14 @@
 */
 package cn.echo.serialno.core;
 
+import cn.echo.serialno.conf.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
-import java.util.Map;
 
 /**************************
  * SerialnoCache
@@ -25,9 +24,6 @@ import java.util.Map;
 public class SerialnoCache {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-	@Value("${serialno.init.nums:{}}")
-	private Map<String, Long> serialInitMap;
 
 	private RedisTemplate<String, Number> redisTemplate;
 	//前缀
@@ -60,8 +56,8 @@ public class SerialnoCache {
 
 		long initNum = serialnoEnum.getInitNum();
 		//读取配置内初始号
-		if (serialnoEnum!=null && serialInitMap.containsKey(serialnoEnum.getBizTag())) {
-			initNum = serialInitMap.get(serialnoEnum.getBizTag());
+		if (serialnoEnum!=null && Config.SerialInitMap.containsKey(serialnoEnum.getBizTag())) {
+			initNum = Config.SerialInitMap.get(serialnoEnum.getBizTag());
 		}
 
 		//开始或重新设置了起始位置时调整位置
