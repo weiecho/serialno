@@ -8,11 +8,13 @@ package cn.echo.serialno.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.BoundHashOperations;
 import org.springframework.data.redis.core.BoundListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
+import java.util.Map;
 
 /**************************
  * SerialnoCache
@@ -23,6 +25,9 @@ import java.util.List;
 public class SerialnoCache {
 
 	private final Logger log = LoggerFactory.getLogger(this.getClass());
+
+	@Value("${serialno.init.nums:{}}")
+	private Map<String, Long> serialInitMap;
 
 	private RedisTemplate<String, Number> redisTemplate;
 	//前缀
@@ -53,10 +58,16 @@ public class SerialnoCache {
 		BoundHashOperations<String, String, Number> boundHashOperations = redisTemplate.boundHashOps(preSerialNoKey+"MAT");
 		Number currMaxNo = boundHashOperations.get(serialnoEnum.getBizTag());
 
+		long initNum = serialnoEnum.getInitNum();
+		//读取配置内初始号
+		if (serialnoEnum!=null && serialInitMap.containsKey(serialnoEnum.getBizTag())) {
+			initNum = serialInitMap.get(serialnoEnum.getBizTag());
+		}
+
 		//开始或重新设置了起始位置时调整位置
-		if (currMaxNo==null || currMaxNo.intValue() <= serialnoEnum.getInitNum()) {
-			boundHashOperations.put(serialnoEnum.getBizTag(), serialnoEnum.getInitNum() + serialnoEnum.getStep());
-			return serialnoEnum.getInitNum();
+		if (currMaxNo==null || currMaxNo.intValue() <= initNum) {
+			boundHashOperations.put(serialnoEnum.getBizTag(), initNum + serialnoEnum.getStep());
+			return initNum;
 		}
 
 		boundHashOperations.increment(serialnoEnum.getBizTag(), serialnoEnum.getStep());
