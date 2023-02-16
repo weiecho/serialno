@@ -1,5 +1,6 @@
 package cn.echo.serialno;
 
+import cn.echo.serialno.conf.Config;
 import cn.echo.serialno.core.SerialnoCache;
 import cn.echo.serialno.core.SerialnoEnumerable;
 import cn.echo.serialno.core.SerialnoHandle;
@@ -13,9 +14,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 序列号生成器
+ *
  * @author lonyee
  */
 public class SerialnoGenerator {
@@ -37,81 +41,67 @@ public class SerialnoGenerator {
      * 根据标识获取编号
      */
     public Long getSerialno(SerialnoEnumerable serialnoEnum) {
-        return serialnoCache.getSerialno(serialnoEnum);
-    }
-
-
-    /**
-     * 根据标识获取编号
-     */
-    public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer prefix, Integer length) {
-        return this.getSerialno(serialnoEnum, prefix, length, 0);
-    }
-    
-    /**
-     * 根据标识获取编号
-     */
-    public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer randomLength) {
-        return this.getSerialno(serialnoEnum, 0, 0, randomLength);
-    }
-
-    /**
-     * 根据标识获取编号
-     */
-    public Long getSerialno(SerialnoEnumerable serialnoEnum, Integer prefix, Integer length, Integer randomLength) {
         int len = 0;
         long pow = 0;
         long pno = 0;
-        if (prefix!=null && prefix>0) {
-            len = (int) Math.log10(prefix) +1;
-            if (len + randomLength >= length) {
+        if (!serialnoEnum.getPrefix().isEmpty() && this.isNumber(serialnoEnum.getPrefix())) {
+            int prefix = Integer.parseInt(serialnoEnum.getPrefix());
+            len = (int) Math.log10(prefix) + 1;
+            if (len + serialnoEnum.getRandomLength() >= serialnoEnum.getLength()) {
                 return 0L;
             }
-            pow = (long) Math.pow(10, length - len);
+            pow = (long) Math.pow(10, serialnoEnum.getLength() - len);
             pno = prefix * pow;
         }
-        long sno = serialnoCache.getSerialno(serialnoEnum);
+
+        long sno = serialnoCache.getSerialno(serialnoEnum) + (10000000L * Config.envCode);
         long suffix = 0;
-        if (randomLength!=null && randomLength>0) {
-            pow = (long) Math.pow(10, randomLength);
+        if (serialnoEnum.getRandomLength() != null && serialnoEnum.getRandomLength() > 0) {
+            pow = (long) Math.pow(10, serialnoEnum.getRandomLength());
             suffix = ThreadLocalRandom.current().nextLong(pow);
             sno = sno * pow;
         }
         return pno + sno + suffix;
     }
 
+
     /**
-     * 根据标识获取编号
+     * 通过正则表达式判断字符串是否为数字
      */
-    public String getSerialno(SerialnoEnumerable serialnoEnum, String prefix, Integer length) {
-        return this.getSerialno(serialnoEnum, prefix, length, 0);
+    private boolean isNumber(String str) {
+        Pattern pattern = Pattern.compile("[0-9]*");
+        Matcher m = pattern.matcher(str);
+        // 如果正则匹配通过 m.matches() 方法返回 true ，反之 false
+        return m.matches();
     }
+
 
     /**
      * 根据标识获取编号
      */
-    public String getSerialno(SerialnoEnumerable serialnoEnum, String prefix, Integer length, Integer randomLength) {
-        if (prefix==null || length<=prefix.length()) {
+    public String getSerialnoWithChar(SerialnoEnumerable serialnoEnum) {
+        if (serialnoEnum.getPrefix() == null || serialnoEnum.getLength() <= serialnoEnum.getPrefix().length()) {
             return "0";
         }
 
-        long sno = serialnoCache.getSerialno(serialnoEnum);
+        //根据当前环境Code配置+初始号
+        long sno = serialnoCache.getSerialno(serialnoEnum) + (10000000L * Config.envCode);
         long suffix = 0;
-        if (randomLength!=null && randomLength>0) {
-            long pow = (long) Math.pow(10, randomLength);
+        if (serialnoEnum.getRandomLength() != null && serialnoEnum.getRandomLength() > 0) {
+            long pow = (long) Math.pow(10, serialnoEnum.getRandomLength());
             suffix = ThreadLocalRandom.current().nextLong(pow);
             sno = sno * pow;
         }
-        String format = "%0"+ (length - prefix.length() - randomLength) +"d";
-        return prefix + String.format(format, sno + suffix);
+        String format = "%0" + (serialnoEnum.getLength() - serialnoEnum.getPrefix().length() - serialnoEnum.getRandomLength()) + "d";
+        return serialnoEnum.getPrefix() + String.format(format, sno + suffix);
     }
 
     /**
      * 生成编号池
-     * */
+     */
     public void generateSerialnos() {
         log.info("开始生成编号池 ... ");
-        for (SerialnoEnumerable serialnoEnum: serialnoEnums) {
+        for (SerialnoEnumerable serialnoEnum : serialnoEnums) {
             serialnoHandle.generateSerialNo(serialnoEnum);
         }
         log.info("编号池生成完成. ");
@@ -134,7 +124,7 @@ public class SerialnoGenerator {
             public void run() {
                 generateSerialnos();
             }
-        }, 10*1000L, 10*60*1000L, TimeUnit.MILLISECONDS);
+        }, 10 * 1000L, 10 * 60 * 1000L, TimeUnit.MILLISECONDS);
     }
 
 }

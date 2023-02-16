@@ -3,15 +3,18 @@ package cn.echo.serialno.conf;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 @Component
 public class Config {
 
-    public static Map<String, Long> SerialInitMap;
+    /**
+     * 环境编号（0-10）
+     * 建议生产环境编号10
+     * 其他每个环境预留1000w个编号
+     */
+    public static int envCode;
 
-    @Value("#{${serialno.init.nums:{}}}")
-    public void setSerialInitMap(Map<String, Long> initMap) {
-        SerialInitMap = initMap;
+    @Value("${serialno.env.code:0}")
+    public void setEnvCode(int code) {
+        envCode = code;
     }
 }
